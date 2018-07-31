@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<level>
+    <!-- floor 1 -->
+    <floor>1 300 28</floor> <!-- N -->
+
+    <!-- floor 2 -->
+    <floor>2 56 60</floor> <!-- G -->
+    <floor>2 176 84</floor> <!-- I -->
+    <floor>2 300 40</floor> <!-- N -->
+    <floor>2 408 28</floor> <!-- N -->
+    <floor>2 480 28</floor> <!-- K -->
+    <floor>2 552 28</floor> <!-- K -->
+
+    <!-- floor 3 -->
+    <floor>3 28 28</floor> <!-- G -->
+    <floor>3 116 28</floor> <!-- G -->
+    <floor>3 204 28</floor> <!-- I -->
+    <floor>3 300 56</floor> <!-- N -->
+    <floor>3 408 28</floor> <!-- N -->
+    <floor>3 480 28</floor> <!-- K -->
+    <floor>3 536 28</floor> <!-- K -->
+
+    <!-- floor 4 -->
+    <floor>4 8 28</floor> <!-- G -->
+    <floor>4 204 28</floor> <!-- I -->
+    <floor>4 300 28</floor> <!-- N -->
+    <floor>4 356 12</floor> <!-- N -->
+    <floor>4 408 28</floor> <!-- N -->
+    <floor>4 480 56</floor> <!-- K -->
+
+    <!-- floor 5 -->
+    <floor>5 8 28</floor> <!-- G -->
+    <floor>5 84 60</floor> <!-- G -->
+    <floor>5 204 28</floor> <!-- I -->
+    <floor>5 300 28</floor> <!-- N -->
+    <floor>5 368 12</floor> <!-- N -->
+    <floor>5 408 28</floor> <!-- N -->
+    <floor>5 480 28</floor> <!-- K -->
+    <floor>5 536 28</floor> <!-- K -->
+
+    <!-- floor 6 -->
+    <floor>6 28 28</floor> <!-- G -->
+    <floor>6 116 28</floor> <!-- G -->
+    <floor>6 204 28</floor> <!-- I -->
+    <floor>6 300 28</floor> <!-- N -->
+    <floor>6 380 56</floor> <!-- N -->
+    <floor>6 480 28</floor> <!-- K -->
+    <floor>6 552 28</floor> <!-- K -->
+
+    <!-- floor 7 -->
+    <floor>7 56 60</floor> <!-- G -->
+    <floor>7 176 84</floor> <!-- I -->
+    <floor>7 300 28</floor> <!-- N -->
+    <floor>7 392 44</floor> <!-- N -->
+    <floor>7 480 28</floor> <!-- K -->
+    <floor>7 568 28</floor> <!-- K -->
+
+    <!-- floor 8 -->
+    <floor>8 408 28</floor> <!-- N -->
+
+    <!-- floor 9 -->
+    <floor>9 4 592</floor>
+</level>

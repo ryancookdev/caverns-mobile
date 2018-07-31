@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<level>
+    <!-- floor 4 -->
+    <floor>4 196 48</floor>
+    <floor>4 356 48</floor>
+
+    <!-- floor 5 -->
+    <floor>5 228 48</floor>
+    <floor>5 324 48</floor>
+
+    <!-- floor 6 -->
+    <floor>6 276 48</floor>
+
+    <!-- floor 7 -->
+    <floor>7 228 48</floor>
+    <floor>7 324 48</floor>
+
+    <!-- floor 8 -->
+    <floor>8 196 48</floor>
+    <floor>8 356 48</floor>
+
+    <!-- floor 9 -->
+    <floor>9 4 592</floor>
+</level>

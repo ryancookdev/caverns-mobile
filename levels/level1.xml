@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<level>
+    <width>600</width>
+
+    <floor>1 50 100</floor>
+    <floor>2 500 100</floor>
+    <floor>3 425 175</floor>
+    <floor>4 5 595</floor>
+
+    <signpost>2 590</signpost>
+    <signpost>4 200</signpost>
+</level>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<level>
+    <!-- floor 2 -->
+    <floor>2 204 60</floor> <!-- big heart -->
+    <floor>2 316 60</floor> <!-- big heart -->
+
+    <!-- floor 3 -->
+    <floor>3 176 40</floor> <!-- big heart -->
+    <floor>3 280 24</floor> <!-- big heart -->
+    <floor>3 368 40</floor> <!-- big heart -->
+
+    <!-- floor 4 -->
+    <floor>4 192 40</floor> <!-- big heart -->
+    <floor>4 352 40</floor> <!-- big heart -->
+
+    <!-- floor 5 -->
+    <floor>5 40 32</floor> <!-- small heart left -->
+    <floor>5 120 32</floor> <!-- small heart left -->
+    <floor>5 232 40</floor> <!-- big heart -->
+    <floor>5 312 40</floor> <!-- big heart -->
+    <floor>5 432 32</floor> <!-- small heart right -->
+    <floor>5 512 32</floor> <!-- small heart right -->
+
+    <!-- floor 6 -->
+    <floor>6 28 56</floor> <!-- small heart left -->
+    <floor>6 108 56</floor> <!-- small heart left -->
+    <floor>6 272 40</floor> <!-- big heart -->
+    <floor>6 420 56</floor> <!-- small heart right -->
+    <floor>6 500 56</floor> <!-- small heart right -->
+
+    <!-- floor 7 -->
+    <floor>7 60 72</floor> <!-- small heart left -->
+    <floor>7 452 72</floor> <!-- small heart right -->
+
+    <!-- floor 8 -->
+    <floor>8 88 16</floor> <!-- small heart left -->
+    <floor>8 480 16</floor> <!-- small heart right -->
+
+    <!-- floor 9 -->
+    <floor>9 4 592</floor> <!-- big heart -->
+</level>
