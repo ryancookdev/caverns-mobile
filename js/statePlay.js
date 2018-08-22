@@ -141,7 +141,7 @@ var statePlay = function () {
                 eventController.trigger('BUTTON_RIGHT');
             }
         } else {
-            eventController.trigger('PLAYER_FALLING');
+            eventController.trigger('PLAYER_NOT_TOUCHING_DOWN');
         }
 
         // Check touch movement

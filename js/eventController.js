@@ -11,8 +11,8 @@ var EventController = function () {
             /**
              * Player events
              */
-            'PLAYER_FALLING',
             'PLAYER_TOUCHING_DOWN',
+            'PLAYER_NOT_TOUCHING_DOWN',
             'REQUEST_PLAYER_STOP_MOVING',
 
             /**
