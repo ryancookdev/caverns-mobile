@@ -1,5 +1,4 @@
 var PlayerFactory = {
-
     create: function (x, y) {
         var player,
             stateHealth,
@@ -10,21 +9,21 @@ var PlayerFactory = {
             motionEnum = {'STANDING': 1, 'RUNNING': 2, 'JUMPING': 3, 'FALLING': 4, 'DESCENDING': 5},
             graphics,
             // Constants
-            DEFAULT_SPEED = 180,
-            DEFAULT_JUMP_SPEED = 310,
-            DEFAULT_GRAPPLE_JUMP_SPEED = 310,
-            DEFAULT_FALLING_GRAVITY = 820,
-            DEFAULT_DESCENDING_GRAVITY = 300,
+            SPEED = 160,
+            JUMP_SPEED = 340,
+            GRAPPLE_JUMP_SPEED = 340,
+            FALLING_GRAVITY = 1000,
+            DESCENDING_GRAVITY = 300,
             // TODO: move this out of here
             grappleAimAngle = 0,
             grappleAimAngleDirection = 1;
 
         player = game.add.sprite(x, y, 'player');
         game.physics.arcade.enable(player);
-        player.animations.add('right', Phaser.Animation.generateFrameNames('player/run/right/', 1, 6, '', 1), 10, true, false);
-        player.animations.add('left', Phaser.Animation.generateFrameNames('player/run/left/', 1, 6, '', 1), 10, true, false);
+        player.animations.add('right', Phaser.Animation.generateFrameNames('player/run/right/', 1, 6, '', 1), 12, true, false);
+        player.animations.add('left', Phaser.Animation.generateFrameNames('player/run/left/', 1, 6, '', 1), 12, true, false);
         player.anchor.set(0.5);
-        player.body.gravity.y = DEFAULT_DESCENDING_GRAVITY;
+        player.body.gravity.y = DESCENDING_GRAVITY;
         player.body.collideWorldBounds = true;
         player.body.setSize(20, 44, 17, 2); // collision box
         game.camera.follow(player, Phaser.Camera.FOLLOW_TOPDOWN);
@@ -42,7 +41,7 @@ var PlayerFactory = {
             eventController.subscribe(handleButtonLeft, 'BUTTON_LEFT');
             eventController.subscribe(handleButtonRight, 'BUTTON_RIGHT');
             eventController.subscribe(handleButtonJump, 'BUTTON_JUMP');
-            eventController.subscribe(handleRequestPlayerStopMoving, 'REQUEST_PLAYER_STOP_MOVING');
+            eventController.subscribe(handleButtonLeftRightNotPressed, 'BUTTON_LEFT_RIGHT_NOT_PRESSED');
             eventController.subscribe(handlePlayerTouchingDown, 'PLAYER_TOUCHING_DOWN');
             eventController.subscribe(handlePlayerNotTouchingDown, 'PLAYER_NOT_TOUCHING_DOWN');
             eventController.subscribe(handleGrappleFullyRetracted, 'GRAPPLE_FULLY_RETRACTED');
@@ -50,13 +49,14 @@ var PlayerFactory = {
             eventController.subscribe(handleGrappleCancel, 'GRAPPLE_CANCEL');
             eventController.subscribe(handleGrappleShoot, 'GRAPPLE_SHOOT');
             eventController.subscribe(handleGrappleAim, 'GRAPPLE_AIM');
+            eventController.subscribe(handleBeatRoom, 'BEAT_ROOM');
         };
 
         player.unregisterEvents = function () {
             eventController.unsubscribe(handleButtonLeft);
             eventController.unsubscribe(handleButtonRight);
             eventController.unsubscribe(handleButtonJump);
-            eventController.unsubscribe(handleRequestPlayerStopMoving);
+            eventController.unsubscribe(handleButtonLeftRightNotPressed);
             eventController.unsubscribe(handlePlayerTouchingDown);
             eventController.unsubscribe(handlePlayerNotTouchingDown);
             eventController.unsubscribe(handleGrappleFullyRetracted);
@@ -64,6 +64,7 @@ var PlayerFactory = {
             eventController.unsubscribe(handleGrappleCancel);
             eventController.unsubscribe(handleGrappleShoot);
             eventController.unsubscribe(handleGrappleAim);
+            eventController.unsubscribe(handleBeatRoom);
         };
 
         player.setGraphics = function (sharedGraphics) {
@@ -88,7 +89,10 @@ var PlayerFactory = {
          */
 
         var jump = function () {
-            player.body.velocity.y = -DEFAULT_JUMP_SPEED;
+            var orientation = (isFacingLeft() ? 'left' : 'right');
+
+            player.body.velocity.y = -JUMP_SPEED;
+            player.frameName = 'player/jump/' + orientation;
         };
 
         var stopMoving = function () {
@@ -103,26 +107,34 @@ var PlayerFactory = {
         };
 
         var moveLeft = function () {
-            player.body.velocity.x = -DEFAULT_SPEED;
-            player.animations.play('left');
+            player.body.velocity.x = -SPEED;
+            if (player.body.touching.down) {
+                player.animations.play('left');
+            } else {
+                player.animations.stop();
+                player.frameName = 'player/jump/left';
+            }
         };
 
         var moveRight = function () {
-            player.body.velocity.x = DEFAULT_SPEED;
-            player.animations.play('right');
-        };
-
-        var faceRight = function () {
-            player.frameName = 'player/jump/right';
-        };
-
-        var faceLeft = function () {
-            player.frameName = 'player/jump/left';
+            player.body.velocity.x = SPEED;
+            if (player.body.touching.down) {
+                player.animations.play('right');
+            } else {
+                player.animations.stop();
+                player.frameName = 'player/jump/right';
+            }
         };
 
         var fall = function () {
             var motion = (isJumping() ? 'jump' : 'fall'),
                 orientation = (isFacingLeft() ? 'left' : 'right');
+
+            // Player may be falling even as the grapple retracts
+            // TODO: Handle this state conflict better
+            if (player.body.velocity.y > 0) {
+                player.body.velocity.x = 0;
+            }
 
             player.frameName = 'player/' + motion + '/' + orientation;
             player.animations.stop();
@@ -134,7 +146,7 @@ var PlayerFactory = {
         };
 
         var touchDown = function () {
-            player.body.gravity.y = DEFAULT_FALLING_GRAVITY;
+            player.body.gravity.y = FALLING_GRAVITY;
         };
 
         /**
@@ -227,7 +239,7 @@ var PlayerFactory = {
 
         var grappleJump = function () {
             stateMotion = motionEnum.JUMPING;
-            player.body.velocity.y = -DEFAULT_GRAPPLE_JUMP_SPEED;
+            player.body.velocity.y = -GRAPPLE_JUMP_SPEED;
         };
 
         var shootGrapple = function () {
@@ -258,11 +270,6 @@ var PlayerFactory = {
             if (isDescending()) {
                 return;
             }
-            if (!player.body.touching.down) {
-                stateOrientation = orientationEnum.LEFT;
-                faceLeft();
-                return;
-            }
             stateOrientation = orientationEnum.LEFT;
             moveLeft();
         };
@@ -272,11 +279,6 @@ var PlayerFactory = {
                 return;
             }
             if (isDescending()) {
-                return;
-            }
-            if (!player.body.touching.down) {
-                stateOrientation = orientationEnum.RIGHT;
-                faceRight();
                 return;
             }
             stateOrientation = orientationEnum.RIGHT;
@@ -294,11 +296,12 @@ var PlayerFactory = {
             jump();
         };
 
-        var handleRequestPlayerStopMoving = function () {
-            if (!isAlive()) {
-                return;
+        var handleButtonLeftRightNotPressed = function () {
+            if (player.body.touching.down) {
+                if (stateMotion !== motionEnum.JUMPING) {
+                    stopMoving();
+                }
             }
-            stopMoving();
         };
 
         var handlePlayerTouchingDown = function () {
@@ -345,6 +348,10 @@ var PlayerFactory = {
 
         var handleGrappleAim = function () {
             aimGrapple();
+        };
+
+        var handleBeatRoom = function () {
+            stopMoving();
         };
 
         return player;

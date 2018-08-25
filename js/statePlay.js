@@ -49,7 +49,7 @@ var statePlay = function () {
         levelWidth = levelXml.getElementsByTagName('width')[0].innerHTML;
 
         game.world.setBounds(0, 0, parseInt(levelWidth), 900);
-        game.physics.arcade.checkCollision.up = false;
+        game.physics.arcade.checkCollision.up = false; // or you'll hit your head on the cave ceiling
         game.stage.backgroundColor = '#000000';
 
         // For grapple and floor marks
@@ -186,9 +186,7 @@ var statePlay = function () {
         }
 
         if (!isTouchingButtonLeft && !isTouchingButtonRight) {
-            if (player.body.touching.down) {
-                eventController.trigger('REQUEST_PLAYER_STOP_MOVING');
-            }
+            eventController.trigger('BUTTON_LEFT_RIGHT_NOT_PRESSED');
         }
 
         // Shoot grapple
@@ -238,10 +236,10 @@ var statePlay = function () {
             pixelCount += length;
         }
 
-        platforms.forEach(function (item) {
-            item.body.immovable = true;
-            item.body.checkCollision.left = false;
-            item.body.checkCollision.right = false;
+        platforms.forEach(function (platform) {
+            platform.body.immovable = true;
+            platform.body.checkCollision.left = false;
+            platform.body.checkCollision.right = false;
         }, self);
 
         // Level text
@@ -275,40 +273,28 @@ var statePlay = function () {
         platforms.enableBody = true;
 
         // ground
-        floorPlatform = createPlatform(5, platformVerticalSpacing * 15, width - 5, platformHeight);
+        floorPlatform = createPlatform(5, platformVerticalSpacing * 12, width - 5, platformHeight);
         pixelCount = width - 5;
 
         // platforms
-        for (i = 2; i < 15; i++) {
+        for (i = 2; i < 12; i++) {
             createRow(i);
         }
 
-        // starting platform
-        createPlatform(5, platformVerticalSpacing, 60, platformHeight);
-        pixelCount += 60;
-
         platforms.forEach(function (item) {
             item.body.immovable = true;
-            item.body.checkCollision.left = false;
-            item.body.checkCollision.right = false;
         }, self);
     };
 
     var createRow = function (rowNumber) {
         // Create initial gap
-        var maxX = randomInRange(5, 20) * 15, // The x position of the right pixel of the rightmost platform
+        var maxX = randomInRange(2, 20) * 15, // The x position of the right pixel of the rightmost platform
             newMaxX = 0,
             rowCount = 0,
-            maxRightEdge = 2150;
-
-        // Create some space for the initial platform
-        if (rowNumber === 2) {
-            maxX += 70;
-            maxRightEdge -= 70;
-        }
+            maxRightEdge = 1000;
 
         while (maxX < maxRightEdge) { // Don't go to the right edge
-            newMaxX = maxX + randomInRange(3, 10) * 15;
+            newMaxX = maxX + randomInRange(4, 15) * 15;
             createPlatform(maxX, platformVerticalSpacing * rowNumber, newMaxX - maxX, platformHeight);
             rowCount += (newMaxX - maxX) + 1;
             // Create a gap
@@ -318,12 +304,14 @@ var statePlay = function () {
         pixelCount += rowCount;
     };
 
+    // TODO: Create a platform class
     var createPlatform = function (x, y, width, height) {
         var platform = game.add.tileSprite(x, y, width, height, 'ground');
         platforms.add(platform);
         return platform;
     };
 
+    // TODO: Create a signpost class
     var createSignpost = function (x, y) {
         var signpost = game.add.sprite(x, y + 1, 'signpost'); // +1 to ensure collision with platform
         signposts.add(signpost);
@@ -335,7 +323,7 @@ var statePlay = function () {
     var beatRoom = function () {
         redrawScreen(); // Make sure the last floor mark is displayed
 
-        eventController.trigger('REQUEST_PLAYER_STOP_MOVING');
+        eventController.trigger('BEAT_ROOM');
         animationScene = true;
         roomComplete = true;
 
@@ -419,6 +407,7 @@ var statePlay = function () {
         }
     };
 
+    // TODO: WTF is this doing here?
     var retractGrapple = function () {
         grapple.body.velocity.x = 0;
         grapple.body.velocity.y = 0;
@@ -426,10 +415,12 @@ var statePlay = function () {
         grapple.isRetracting = true;
     };
 
+    // TODO: WTF is this doing here?
     var movePlayerToGrapple = function () {
         game.physics.arcade.moveToXY(player, grapple.x, grapple.y + 20, 300);
     };
 
+    // TODO: WTF is this doing here?
     var drawGrapple = function () {
         graphics.lineStyle(1, 0xffffff);
         graphics.moveTo(player.x, player.y);
@@ -438,6 +429,7 @@ var statePlay = function () {
 
     var redrawScreen= function () {
         graphics.clear();
+        // TODO: Trigger an event instead
         floorMarks.draw(platformHeight, floorMarkColor, platformVerticalSpacing);
     };
 
@@ -450,14 +442,15 @@ var statePlay = function () {
         level++;
     };
 
+    // TODO: Trigger an event instead
     var collidePlayerPlatform = function (player, platform) {
         // Allow player to jump up through the platform
         if (player.body.velocity.y >= 0) {
             // Only mark the platform if the player is standing on it
             if ((player.y + player.height / 2 - 4) < platform.y) {
                 floorMarks.newFloorMark(platform, player, platformVerticalSpacing);
+                return true;
             }
-            return true;
         }
         return false;
     };
@@ -466,12 +459,14 @@ var statePlay = function () {
         return true;
     };
 
+    // TODO: Trigger an event instead
     var collideGrapplePlatform = function (grapple, platform) {
         if (grapple.isShooting) {
             retractGrapple();
         }
     };
 
+    // TODO: Trigger an event instead
     var collideSignpostPlatform = function (signpost, platform) {
         floorMarks.newFloorMark(platform, signpost, platformVerticalSpacing);
         return true;

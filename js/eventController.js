@@ -2,18 +2,23 @@ var EventController = function () {
     var subscribers = [],
         eventTypes = [
             /**
+             * Level events
+             */
+            'BEAT_ROOM',
+
+            /**
              * Movement events
              */
             'BUTTON_LEFT',
             'BUTTON_RIGHT',
             'BUTTON_JUMP',
+            'BUTTON_LEFT_RIGHT_NOT_PRESSED',
 
             /**
              * Player events
              */
             'PLAYER_TOUCHING_DOWN',
             'PLAYER_NOT_TOUCHING_DOWN',
-            'REQUEST_PLAYER_STOP_MOVING',
 
             /**
              * Grapple events
