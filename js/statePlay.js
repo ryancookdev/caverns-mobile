@@ -38,22 +38,27 @@ var statePlay = function () {
     };
 
     self.create = function () {
-        var levelWidth;
+        var levelWidth,
+            levelXml;
 
         eventController = new EventController();
         inputController = new InputController();
         inputController.build();
 
-        var levelXml = loadLevel();
-
-        levelWidth = levelXml.getElementsByTagName('width')[0].innerHTML;
+        if (level === 1) {
+            levelXml = loadLevel();
+            levelWidth = levelXml.getElementsByTagName('width')[0].innerHTML;
+        } else {
+            levelWidth = 1200;
+        }
 
         game.world.setBounds(0, 0, parseInt(levelWidth), 900);
         game.physics.arcade.checkCollision.up = false; // or you'll hit your head on the cave ceiling
         game.stage.backgroundColor = '#000000';
 
-        // For grapple and floor marks
         floorMarkColor = 0xc58917;
+
+        // For grapple and floor marks
         graphicsLayer = game.add.group();
         graphicsLayer.z = 1;
         graphics = game.add.graphics(0, 0);
@@ -81,8 +86,11 @@ var statePlay = function () {
 
         grapple = GrappleFactory.create(player.x, player.y);
         grapple.registerEvents();
+        grapple.setGraphics(graphics);
 
+        // Let the player and grapple know about each other
         player.setGrapple(grapple);
+        grapple.setPlayer(player);
 
         playerGroup.add(player);
         playerGroup.add(grapple);
@@ -106,28 +114,11 @@ var statePlay = function () {
         }
 
         redrawScreen();
-        checkCollisions();
 
-        // Grapple logic
-        if (grapple.isShooting && grapple.isOffScreen()) {
-            eventController.trigger('GRAPPLE_OFF_SCREEN');
-        }
-        if (grapple.isShooting && grapple.isFullyExtended(player)) {
-            eventController.trigger('GRAPPLE_OFF_SCREEN');
-        }
-        if (grapple.isShooting || grapple.isRetracting) {
-            drawGrapple();
-        }
-        if (grapple.isRetracting) {
-            movePlayerToGrapple();
-        }
-        if (grapple.isRetracting
-            && player.x > grapple.x - 3
-            && player.x < grapple.x + 3
-            && player.y < grapple.y + 20
-        ) {
-            eventController.trigger('GRAPPLE_FULLY_RETRACTED');
-        }
+        // All drawing to the graphics object (by other game objects) must happen after redrawScreen
+        eventController.trigger('UPDATE');
+
+        checkCollisions();
 
         if (animationScene) {
             return;
@@ -191,7 +182,6 @@ var statePlay = function () {
 
         // Shoot grapple
         if (!isTouchingButtonGrapple && grapple.isAiming()) {
-            grapple.stopAiming();
             eventController.trigger('GRAPPLE_SHOOT');
             // Restore time
             game.time.advancedTiming = false;
@@ -273,22 +263,24 @@ var statePlay = function () {
         platforms.enableBody = true;
 
         // ground
-        floorPlatform = createPlatform(5, platformVerticalSpacing * 12, width - 5, platformHeight);
-        pixelCount = width - 5;
+        floorPlatform = createPlatform(5, platformVerticalSpacing * 12, width - 15, platformHeight);
+        pixelCount = width - 15;
 
         // platforms
         for (i = 2; i < 12; i++) {
             createRow(i);
         }
 
-        platforms.forEach(function (item) {
-            item.body.immovable = true;
+        platforms.forEach(function (platform) {
+            platform.body.immovable = true;
+            platform.body.checkCollision.left = false;
+            platform.body.checkCollision.right = false;
         }, self);
     };
 
     var createRow = function (rowNumber) {
         // Create initial gap
-        var maxX = randomInRange(2, 20) * 15, // The x position of the right pixel of the rightmost platform
+        var maxX = randomInRange(2, 13) * 15, // The x position of the right pixel of the rightmost platform
             newMaxX = 0,
             rowCount = 0,
             maxRightEdge = 1000;
@@ -296,7 +288,7 @@ var statePlay = function () {
         while (maxX < maxRightEdge) { // Don't go to the right edge
             newMaxX = maxX + randomInRange(4, 15) * 15;
             createPlatform(maxX, platformVerticalSpacing * rowNumber, newMaxX - maxX, platformHeight);
-            rowCount += (newMaxX - maxX) + 1;
+            rowCount += (newMaxX - maxX);
             // Create a gap
             newMaxX += randomInRange(5, 40) * 15;
             maxX = newMaxX;
@@ -407,26 +399,6 @@ var statePlay = function () {
         }
     };
 
-    // TODO: WTF is this doing here?
-    var retractGrapple = function () {
-        grapple.body.velocity.x = 0;
-        grapple.body.velocity.y = 0;
-        grapple.isShooting = false;
-        grapple.isRetracting = true;
-    };
-
-    // TODO: WTF is this doing here?
-    var movePlayerToGrapple = function () {
-        game.physics.arcade.moveToXY(player, grapple.x, grapple.y + 20, 300);
-    };
-
-    // TODO: WTF is this doing here?
-    var drawGrapple = function () {
-        graphics.lineStyle(1, 0xffffff);
-        graphics.moveTo(player.x, player.y);
-        graphics.lineTo(grapple.x, grapple.y);
-    };
-
     var redrawScreen= function () {
         graphics.clear();
         // TODO: Trigger an event instead
@@ -442,7 +414,6 @@ var statePlay = function () {
         level++;
     };
 
-    // TODO: Trigger an event instead
     var collidePlayerPlatform = function (player, platform) {
         // Allow player to jump up through the platform
         if (player.body.velocity.y >= 0) {
@@ -459,14 +430,10 @@ var statePlay = function () {
         return true;
     };
 
-    // TODO: Trigger an event instead
     var collideGrapplePlatform = function (grapple, platform) {
-        if (grapple.isShooting) {
-            retractGrapple();
-        }
+        eventController.trigger('GRAPPLE_HIT_PLATFORM');
     };
 
-    // TODO: Trigger an event instead
     var collideSignpostPlatform = function (signpost, platform) {
         floorMarks.newFloorMark(platform, signpost, platformVerticalSpacing);
         return true;

@@ -74,7 +74,7 @@ var FloorMarks = function () {
     };
 
     this.draw = function (height, color, verticalSpacing) {
-        graphics.lineStyle(height, color);
+        graphics.lineStyle(height, color, 1);
         for (var index in fm) {
             var i,
                 row = fm[index],

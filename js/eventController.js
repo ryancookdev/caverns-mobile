@@ -4,6 +4,7 @@ var EventController = function () {
             /**
              * Level events
              */
+            'UPDATE', // Rendering loop
             'BEAT_ROOM',
 
             /**
@@ -27,6 +28,7 @@ var EventController = function () {
             'GRAPPLE_SHOOT',
             'GRAPPLE_CANCEL',
             'GRAPPLE_OFF_SCREEN',
+            'GRAPPLE_HIT_PLATFORM',
             'GRAPPLE_FULLY_RETRACTED',
             'GRAPPLE_ANGLE_LEFT',
             'GRAPPLE_ANGLE_RIGHT',
