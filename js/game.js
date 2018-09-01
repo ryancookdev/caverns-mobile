@@ -4,7 +4,7 @@
 
 // Set up game globals
 var dev = true,
-    level = 2,
+    level = 1,
     heartCount = 3,
     eventController,
     inputController,

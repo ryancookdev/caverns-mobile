@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<level>
+    <width>1200</width>
+    <platform>1 120 135</platform>
+    <platform>1 435 45</platform>
+    <platform>1 570 75</platform>
+    <platform>1 825 45</platform>
+    <platform>1 975 45</platform>
+    <platform>1 1095 90</platform>
+    <platform>2 165 60</platform>
+    <platform>2 405 105</platform>
+    <platform>2 600 45</platform>
+    <platform>2 720 75</platform>
+    <platform>2 930 120</platform>
+    <platform>3 255 105</platform>
+    <platform>3 585 105</platform>
+    <platform>3 870 60</platform>
+    <platform>3 1050 90</platform>
+    <platform>4 60 90</platform>
+    <platform>4 285 135</platform>
+    <platform>4 495 45</platform>
+    <platform>4 735 90</platform>
+    <platform>4 1035 75</platform>
+    <platform>5 5 1195</platform>
+</level>

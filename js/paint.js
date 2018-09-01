@@ -1,4 +1,4 @@
-var FloorMarks = function () {
+var Paint = function () {
     var graphics,
         fm = {};
 
@@ -31,7 +31,7 @@ var FloorMarks = function () {
         return rowString;
     };
 
-    this.newFloorMark = function (platform, referenceObject, verticalSpacing) {
+    this.newPaint = function (platform, referenceObject, verticalSpacing) {
         var i,
             row,
             x1,

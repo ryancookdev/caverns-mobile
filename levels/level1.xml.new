@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<level>
+    <width>600</width>
+
+    <platform>1 50 100</platform>
+    <platform>2 500 70</platform>
+    <platform>3 425 175</platform>
+    <platform>4 350 250</platform>
+
+    <stone-platform>2 570 30</stone-platform>
+    <stone-platform>4 5 345</stone-platform>
+
+    <signpost>2 590</signpost>
+    <signpost>4 320</signpost>
+</level>

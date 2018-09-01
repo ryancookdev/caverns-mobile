@@ -1,13 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <level>
-    <width>600</width>
+    <width>1200</width>
+    <platform>1 180 90</platform>
+    <platform>1 450 45</platform>
+    <platform>1 585 120</platform>
+    <platform>1 840 120</platform>
+    <platform>2 75 90</platform>
+    <platform>2 300 135</platform>
+    <platform>2 525 120</platform>
+    <platform>2 720 75</platform>
+    <platform>2 900 90</platform>
+    <platform>3 45 120</platform>
+    <platform>3 270 45</platform>
+    <platform>3 480 105</platform>
+    <platform>3 735 60</platform>
+    <platform>3 1020 105</platform>
+    <platform>4 150 90</platform>
+    <platform>4 450 90</platform>
+    <platform>4 735 135</platform>
+    <platform>4 975 60</platform>
+    <platform>5 5 1195</platform>
 
-    <floor>1 50 100</floor>
-    <floor>2 500 100</floor>
-    <floor>3 425 175</floor>
-    <floor>4 5 595</floor>
-
-    <signpost>2 590</signpost>
-    <signpost>4 200</signpost>
+    <ginkian>2 365</ginkian>
+    <ginkian>3 1075</ginkian>
 </level>

@@ -2,4 +2,23 @@
 
 <level>
     <width>1200</width>
+    <platform>1 195 75</platform>
+    <platform>1 405 45</platform>
+    <platform>1 675 150</platform>
+    <platform>1 975 105</platform>
+    <platform>2 105 75</platform>
+    <platform>2 315 60</platform>
+    <platform>2 600 120</platform>
+    <platform>2 795 150</platform>
+    <platform>2 1035 45</platform>
+    <platform>3 255 60</platform>
+    <platform>3 465 150</platform>
+    <platform>3 810 60</platform>
+    <platform>3 960 135</platform>
+    <platform>4 225 45</platform>
+    <platform>4 375 90</platform>
+    <platform>4 540 60</platform>
+    <platform>4 690 60</platform>
+    <platform>4 870 75</platform>
+    <platform>5 5 1195</platform>
 </level>

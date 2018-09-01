@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<level>
+    <width>1200</width>
+    <platform>1 225 120</platform>
+    <platform>1 555 90</platform>
+    <platform>1 750 105</platform>
+    <platform>1 930 105</platform>
+    <platform>2 300 120</platform>
+    <platform>2 645 60</platform>
+    <platform>2 915 150</platform>
+    <platform>3 60 60</platform>
+    <platform>3 225 75</platform>
+    <platform>3 465 90</platform>
+    <platform>3 675 75</platform>
+    <platform>3 975 120</platform>
+    <platform>4 150 120</platform>
+    <platform>4 360 135</platform>
+    <platform>4 690 75</platform>
+    <platform>4 975 45</platform>
+    <platform>5 5 1195</platform>
+</level>

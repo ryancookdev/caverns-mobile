@@ -1,8 +1,11 @@
+/**
+ * This is essentially a Level class, which delegates logic to each game object where possible
+ */
 var statePlay = function () {
     var self = this,
         playerStartX = 15,
         playerStartY = -10,
-        floorMarkColor,
+        paintColor,
         platformVerticalSpacing = 56,
         platformHeight = 10,
 
@@ -18,13 +21,15 @@ var statePlay = function () {
         graphics,
         grapple,
         platforms,
+        stonePlatforms,
         signposts,
-        floorPlatform,
-        floorMarks,
+        ginkians,
+        paint,
         hud;
 
     self.preload = function () {
-        game.load.image('ground', 'assets/platform.png');
+        game.load.image('platform', 'assets/platform.png');
+        game.load.image('stonePlatform', 'assets/stone-platform.png');
         game.load.atlasJSONHash('player', 'assets/player.png', 'assets/player.json');
         game.load.spritesheet('grapple', 'assets/grapple.png', 5, 5);
         game.load.image('buttonPause', 'assets/blank.png');
@@ -35,6 +40,7 @@ var statePlay = function () {
         game.load.image('heart', 'assets/heart.png');
         game.load.image('heartEmpty', 'assets/heart-empty.png');
         game.load.image('signpost', 'assets/signpost.png');
+        game.load.image('ginkian', 'assets/ginkian.png');
     };
 
     self.create = function () {
@@ -45,20 +51,16 @@ var statePlay = function () {
         inputController = new InputController();
         inputController.build();
 
-        if (level === 1) {
-            levelXml = loadLevel();
-            levelWidth = levelXml.getElementsByTagName('width')[0].innerHTML;
-        } else {
-            levelWidth = 1200;
-        }
+        levelXml = loadLevel();
+        levelWidth = levelXml.getElementsByTagName('width')[0].innerHTML;
 
-        game.world.setBounds(0, 0, parseInt(levelWidth), 900);
+        game.world.setBounds(0, 0, parseInt(levelWidth), 336);
         game.physics.arcade.checkCollision.up = false; // or you'll hit your head on the cave ceiling
         game.stage.backgroundColor = '#000000';
 
-        floorMarkColor = 0xc58917;
+        paintColor = 0xc58917;
 
-        // For grapple and floor marks
+        // For grapple and paint
         graphicsLayer = game.add.group();
         graphicsLayer.z = 1;
         graphics = game.add.graphics(0, 0);
@@ -68,13 +70,12 @@ var statePlay = function () {
         playerGroup.enableBody = true;
 
         // Level
-        floorMarks = new FloorMarks();
-        floorMarks.setGraphics(graphics);
-        if (level === 1) {
-            buildLevel(levelXml);
-        } else {
-            buildRandomLevel(levelWidth);
-        }
+        paint = new Paint();
+        paint.setGraphics(graphics);
+
+        buildLevel(levelXml);
+        //buildRandomLevel(levelWidth, 5);
+        //exportLevelToXml();
 
         game.world.bringToTop(graphicsLayer);
         game.world.bringToTop(playerGroup);
@@ -188,7 +189,7 @@ var statePlay = function () {
             game.time.desiredFps = 60;
         }
 
-        if (floorMarks.totalMarks() === pixelCount) {
+        if (paint.totalMarks() === pixelCount) {
             pixelCount = 0;
             beatRoom();
         }
@@ -203,8 +204,10 @@ var statePlay = function () {
 
     var buildLevel = function (levelXml) {
         var i,
-            allFloorsElem,
+            allPlatformsElem,
+            allStonePlatformsElem,
             allSignpostsElem,
+            allGinkiansElem,
             messageText,
             messagePosition,
             textPositionX,
@@ -213,15 +216,16 @@ var statePlay = function () {
         // Platforms
         platforms = game.add.group();
         platforms.enableBody = true;
+        stonePlatforms = game.add.group();
+        stonePlatforms.enableBody = true;
 
         pixelCount = 0;
-        allFloorsElem = levelXml.getElementsByTagName('floor');
-        for (i = 0; i < allFloorsElem.length; i += 1) {
-            var floor = allFloorsElem[i].childNodes[0].nodeValue;
-            var row = parseInt(floor.split(' ')[0]);
-            var x = parseInt(floor.split(' ')[1]);
-            var length = parseInt(floor.split(' ')[2]);
-
+        allPlatformsElem = levelXml.getElementsByTagName('platform');
+        for (i = 0; i < allPlatformsElem.length; i += 1) {
+            var platform = allPlatformsElem[i].childNodes[0].nodeValue;
+            var row = parseInt(platform.split(' ')[0]);
+            var x = parseInt(platform.split(' ')[1]);
+            var length = parseInt(platform.split(' ')[2]);
             createPlatform(x, platformVerticalSpacing * row, length, platformHeight);
             pixelCount += length;
         }
@@ -230,6 +234,28 @@ var statePlay = function () {
             platform.body.immovable = true;
             platform.body.checkCollision.left = false;
             platform.body.checkCollision.right = false;
+        }, self);
+
+        // Stone platforms
+        allStonePlatformsElem = levelXml.getElementsByTagName('stone-platform');
+        for (i = 0; i < allStonePlatformsElem.length; i += 1) {
+            var platform = allStonePlatformsElem[i].childNodes[0].nodeValue;
+            var row = parseInt(platform.split(' ')[0]);
+            var x = parseInt(platform.split(' ')[1]);
+            var length = parseInt(platform.split(' ')[2]);
+            createStonePlatform(x, platformVerticalSpacing * row, length, platformHeight);
+        }
+
+        platforms.forEach(function (platform) {
+            platform.body.immovable = true;
+            platform.body.checkCollision.left = false;
+            platform.body.checkCollision.right = false;
+        }, self);
+
+        stonePlatforms.forEach(function (stonePlatform) {
+            stonePlatform.body.immovable = true;
+            stonePlatform.body.checkCollision.left = false;
+            stonePlatform.body.checkCollision.right = false;
         }, self);
 
         // Level text
@@ -252,23 +278,34 @@ var statePlay = function () {
             var x = parseInt(signpost.split(' ')[1]);
             createSignpost(x, platformVerticalSpacing * row);
         }
+
+        // Ginkians
+        ginkians = game.add.group();
+        ginkians.enableBody = true;
+
+        allGinkiansElem = levelXml.getElementsByTagName('ginkian');
+        for (i = 0; i < allGinkiansElem.length; i += 1) {
+            var ginkian = allGinkiansElem[i].childNodes[0].nodeValue;
+            var row = parseInt(ginkian.split(' ')[0]);
+            var x = parseInt(ginkian.split(' ')[1]);
+            createGinkian(x, platformVerticalSpacing * row);
+        }
     };
 
-    var buildRandomLevel = function (width) {
+    var buildRandomLevel = function (width, rows) {
         var i;
-
         pixelCount = 0;
 
         platforms = game.add.group();
         platforms.enableBody = true;
 
         // ground
-        floorPlatform = createPlatform(5, platformVerticalSpacing * 12, width - 15, platformHeight);
-        pixelCount = width - 15;
+        createPlatform(5, platformVerticalSpacing * rows, width - 5, platformHeight);
+        pixelCount = width - 5;
 
         // platforms
-        for (i = 2; i < 12; i++) {
-            createRow(i);
+        for (i = 1; i < rows; i++) {
+            createRow(i, width);
         }
 
         platforms.forEach(function (platform) {
@@ -278,42 +315,79 @@ var statePlay = function () {
         }, self);
     };
 
-    var createRow = function (rowNumber) {
-        // Create initial gap
-        var maxX = randomInRange(2, 13) * 15, // The x position of the right pixel of the rightmost platform
+    // TODO: Create a platform class
+    var createRow = function (rowNumber, maxRightEdge) {
+        var minWidth = 15,
+            platformX = randomInRange(1, Math.floor(maxRightEdge / minWidth) / 4) * minWidth,
             newMaxX = 0,
-            rowCount = 0,
-            maxRightEdge = 1000;
+            platformWidth = 0,
+            rowCount = 0;
 
-        while (maxX < maxRightEdge) { // Don't go to the right edge
-            newMaxX = maxX + randomInRange(4, 15) * 15;
-            createPlatform(maxX, platformVerticalSpacing * rowNumber, newMaxX - maxX, platformHeight);
-            rowCount += (newMaxX - maxX);
+        while (platformX < maxRightEdge) {
+            newMaxX = platformX + randomInRange(3, 10) * minWidth;
+            if (newMaxX > maxRightEdge) {
+                break;
+            }
+
+            platformWidth = newMaxX - platformX;
+            createPlatform(platformX, platformVerticalSpacing * rowNumber, platformWidth, platformHeight);
+            rowCount += (newMaxX - platformX);
+
             // Create a gap
-            newMaxX += randomInRange(5, 40) * 15;
-            maxX = newMaxX;
+            newMaxX += randomInRange(5, 15) * minWidth;
+            platformX = newMaxX;
         }
         pixelCount += rowCount;
     };
 
     // TODO: Create a platform class
     var createPlatform = function (x, y, width, height) {
-        var platform = game.add.tileSprite(x, y, width, height, 'ground');
+        var platform = game.add.tileSprite(x, y, width, height, 'platform');
         platforms.add(platform);
         return platform;
     };
 
+    // TODO: Create a platform class
+    var createStonePlatform = function (x, y, width, height) {
+        var stonePlatform = game.add.tileSprite(x, y, width, height, 'stonePlatform');
+        stonePlatforms.add(stonePlatform);
+        return stonePlatform;
+    };
+
+    var exportLevelToXml = function () {
+        platforms.forEach(function (platform) {
+            var platformXml,
+                row,
+                x,
+                width;
+
+            row = Math.floor((platform.y + 5) / platformVerticalSpacing);
+            x = platform.body.x;
+            width = platform.body.width;
+
+            platformXml = '<platform>' + row + ' ' + x + ' ' + width + '</platform>';
+            console.log(platformXml);
+        }, self);
+    };
+
     // TODO: Create a signpost class
     var createSignpost = function (x, y) {
-        var signpost = game.add.sprite(x, y + 1, 'signpost'); // +1 to ensure collision with platform
+        var signpost = game.add.sprite(x, y + 1, 'signpost');
         signposts.add(signpost);
         signpost.anchor.set(.5, 1);
         signpost.body.setSize(25, 2, 8, 34); // collision box
         signpost.body.immovable = true;
     };
 
+    // TODO: Create a ginkian class
+    var createGinkian = function (x, y) {
+        var ginkian = game.add.sprite(x, y + 2, 'ginkian');
+        ginkians.add(ginkian);
+        ginkian.anchor.set(.5, 1);
+    };
+
     var beatRoom = function () {
-        redrawScreen(); // Make sure the last floor mark is displayed
+        redrawScreen(); // Make sure the last paint is displayed
 
         eventController.trigger('BEAT_ROOM');
         animationScene = true;
@@ -326,20 +400,19 @@ var statePlay = function () {
 
         function animateBeatRoom (i, callback) {
             if (i < 0) {
-                floorMarkColor = 0xc58917;
+                paintColor = 0xc58917;
                 callback();
                 return;
             }
 
-            // Floor
             if (i === 0 || i % 4 === 0) {
-                floorMarkColor = 0x55ffff;
+                paintColor = 0x55ffff;
             } else if (i === 1 || i % 4 === 1) {
-                floorMarkColor = 0x00aa00;
+                paintColor = 0x00aa00;
             } else if (i === 2 || i % 4 === 2) {
-                floorMarkColor = 0xffffff;
+                paintColor = 0xffffff;
             } else if (i === 3 || i % 4 === 3) {
-                floorMarkColor = 0xaa0000;
+                paintColor = 0xaa0000;
             }
 
             game.time.events.add(50, function () {
@@ -402,7 +475,7 @@ var statePlay = function () {
     var redrawScreen= function () {
         graphics.clear();
         // TODO: Trigger an event instead
-        floorMarks.draw(platformHeight, floorMarkColor, platformVerticalSpacing);
+        paint.draw(platformHeight, paintColor, platformVerticalSpacing);
     };
 
     var nextRoom = function () {
@@ -419,9 +492,17 @@ var statePlay = function () {
         if (player.body.velocity.y >= 0) {
             // Only mark the platform if the player is standing on it
             if ((player.y + player.height / 2 - 4) < platform.y) {
-                floorMarks.newFloorMark(platform, player, platformVerticalSpacing);
+                paint.newPaint(platform, player, platformVerticalSpacing);
                 return true;
             }
+        }
+        return false;
+    };
+
+    var collidePlayerStonePlatform = function (player, stonePlatform) {
+        // Allow player to jump up through the platform
+        if (player.body.velocity.y >= 0) {
+            return true;
         }
         return false;
     };
@@ -434,16 +515,11 @@ var statePlay = function () {
         eventController.trigger('GRAPPLE_HIT_PLATFORM');
     };
 
-    var collideSignpostPlatform = function (signpost, platform) {
-        floorMarks.newFloorMark(platform, signpost, platformVerticalSpacing);
-        return true;
-    };
-
     var checkCollisions = function () {
         // Collisions
         game.physics.arcade.collide(player, platforms, null, collidePlayerPlatform);
+        game.physics.arcade.collide(player, stonePlatforms, null, collidePlayerStonePlatform);
         game.physics.arcade.collide(player, signposts, null, collidePlayerSignpost);
-        game.physics.arcade.collide(signposts, platforms, null, collideSignpostPlatform);
         game.physics.arcade.collide(grapple, platforms, null, collideGrapplePlatform);
     };
 };
